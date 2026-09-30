@@ -1,0 +1,9 @@
+@{ ViewData["Title"] = "Access denied"; }
+<div class="auth-wrap">
+    <div class="card-soft auth-card text-center">
+        <span class="stat-icon red mx-auto mb-3"><i class="bi bi-lock"></i></span>
+        <h1 class="h2">You don't have access to this page</h1>
+        <p class="muted">Your account role doesn't include this area. Head back to your own dashboard.</p>
+        <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Back to home</a>
+    </div>
+</div>

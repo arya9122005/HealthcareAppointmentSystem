@@ -1,0 +1,32 @@
+@model List<Appointment>
+@{ ViewData["Title"] = "Consultation notes"; }
+<div class="page-header"><div><h1 class="page-title">Consultation notes</h1><p class="page-sub">Notes you have written for completed visits.</p></div></div>
+
+@if (!Model.Any())
+{
+    <div class="card-soft empty-state"><i class="bi bi-journal-medical"></i><p class="mb-0">No notes yet. Complete a confirmed appointment to add one.</p></div>
+}
+else
+{
+    <div class="card-soft">
+        <div class="table-responsive">
+            <table class="table table-soft">
+                <thead><tr><th>Date</th><th>Patient</th><th>Diagnosis</th><th></th></tr></thead>
+                <tbody>
+                @foreach (var a in Model)
+                {
+                    <tr>
+                        <td class="text-nowrap">@Fmt.ShortDate(a.AppointmentDate)</td>
+                        <td>@a.Patient.User.FullName</td>
+                        <td>@a.ConsultationNote.Diagnosis</td>
+                        <td class="text-end text-nowrap">
+                            <a class="btn btn-soft btn-sm" asp-action="AppointmentDetails" asp-route-id="@a.Id">View</a>
+                            <a class="btn btn-outline-primary btn-sm" asp-action="Complete" asp-route-id="@a.Id">Edit</a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

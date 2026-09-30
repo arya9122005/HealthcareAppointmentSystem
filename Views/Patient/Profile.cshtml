@@ -1,0 +1,62 @@
+@model PatientProfileViewModel
+@{ ViewData["Title"] = "My profile"; }
+<div class="page-header"><div><h1 class="page-title">My profile</h1><p class="page-sub">Keep your details up to date so your doctor has the right information.</p></div></div>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card-soft pad text-center">
+            <span class="avatar lg mx-auto mb-3">@Fmt.Initials(Model.FullName)</span>
+            <h2 class="h4 mb-1">@Model.FullName</h2>
+            <div class="muted">@Model.Email</div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card-soft pad">
+            <form asp-action="Profile" method="post" novalidate>
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="FullName" class="form-label"></label>
+                        <input asp-for="FullName" class="form-control" />
+                        <span asp-validation-for="FullName"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" readonly />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Phone" class="form-label"></label>
+                        <input asp-for="Phone" class="form-control" />
+                        <span asp-validation-for="Phone"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="DateOfBirth" class="form-label"></label>
+                        <input asp-for="DateOfBirth" type="date" class="form-control" max="@DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd")" />
+                        <span asp-validation-for="DateOfBirth"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Gender" class="form-label"></label>
+                        <select asp-for="Gender" class="form-select">
+                            <option value="">Select</option>
+                            <option>Female</option><option>Male</option><option>Other</option><option>Prefer not to say</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="BloodGroup" class="form-label"></label>
+                        <select asp-for="BloodGroup" class="form-select">
+                            <option value="">Select</option>
+                            <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+                            <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Address" class="form-label"></label>
+                        <textarea asp-for="Address" class="form-control" rows="2"></textarea>
+                        <span asp-validation-for="Address"></span>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mt-4">Save changes</button>
+            </form>
+        </div>
+    </div>
+</div>

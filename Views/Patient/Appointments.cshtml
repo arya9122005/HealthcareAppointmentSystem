@@ -1,0 +1,66 @@
+@model PatientAppointmentsViewModel
+@{ ViewData["Title"] = "My appointments"; }
+<div class="page-header">
+    <div><h1 class="page-title">My appointments</h1><p class="page-sub">Upcoming visits and your past history.</p></div>
+    <a class="btn btn-primary" asp-action="Doctors"><i class="bi bi-calendar-plus me-1"></i>Book appointment</a>
+</div>
+
+<div class="card-soft mb-4">
+    <div class="card-head"><h2>Upcoming</h2></div>
+    @if (!Model.Upcoming.Any())
+    {
+        <div class="empty-state"><i class="bi bi-calendar-heart"></i><p class="mb-0">No upcoming appointments.</p></div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-soft">
+                <thead><tr><th>Doctor</th><th>Date &amp; time</th><th>Reason</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                @foreach (var a in Model.Upcoming)
+                {
+                    <tr>
+                        <td><div class="fw-semibold">@a.Doctor.User.FullName</div><div class="small muted">@a.Doctor.Specialization.Name</div></td>
+                        <td>@Fmt.ShortDate(a.AppointmentDate)<div class="small muted">@Fmt.Time(a.StartTime) - @Fmt.Time(a.EndTime)</div></td>
+                        <td class="small">@a.ReasonForVisit</td>
+                        <td><partial name="_StatusBadge" model="a.Status" /></td>
+                        <td class="text-end text-nowrap">
+                            <a class="btn btn-soft btn-sm" asp-action="AppointmentDetails" asp-route-id="@a.Id">Details</a>
+                            <form asp-action="Cancel" asp-route-id="@a.Id" method="post" class="d-inline" onsubmit="return confirm('Cancel this appointment?');">
+                                <button type="submit" class="btn btn-outline-danger btn-sm">Cancel</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<div class="card-soft">
+    <div class="card-head"><h2>Past appointments</h2></div>
+    @if (!Model.Past.Any())
+    {
+        <div class="empty-state"><i class="bi bi-clock-history"></i><p class="mb-0">Nothing here yet.</p></div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-soft">
+                <thead><tr><th>Doctor</th><th>Date &amp; time</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                @foreach (var a in Model.Past)
+                {
+                    <tr>
+                        <td><div class="fw-semibold">@a.Doctor.User.FullName</div><div class="small muted">@a.Doctor.Specialization.Name</div></td>
+                        <td>@Fmt.ShortDate(a.AppointmentDate)<div class="small muted">@Fmt.Time(a.StartTime)</div></td>
+                        <td><partial name="_StatusBadge" model="a.Status" /></td>
+                        <td class="text-end"><a class="btn btn-soft btn-sm" asp-action="AppointmentDetails" asp-route-id="@a.Id">Details</a></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

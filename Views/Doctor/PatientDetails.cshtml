@@ -1,0 +1,47 @@
+@model PatientHistoryViewModel
+@{
+    ViewData["Title"] = "Patient details";
+    var p = Model.Patient;
+    int? age = p.DateOfBirth.HasValue ? (int?)((DateTime.Today - p.DateOfBirth.Value).TotalDays / 365.25) : null;
+}
+<a asp-action="Appointments" class="small"><i class="bi bi-arrow-left"></i> Appointments</a>
+<div class="page-header mt-2"><div><h1 class="page-title">@p.User.FullName</h1><p class="page-sub">Basic details shared for your appointments with this patient.</p></div></div>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card-soft pad">
+            <div class="info-row"><span class="k">Age</span><span>@(age.HasValue ? age + " years" : "Not provided")</span></div>
+            <div class="info-row"><span class="k">Gender</span><span>@(string.IsNullOrEmpty(p.Gender) ? "Not provided" : p.Gender)</span></div>
+            <div class="info-row"><span class="k">Blood group</span><span>@(string.IsNullOrEmpty(p.BloodGroup) ? "Not provided" : p.BloodGroup)</span></div>
+            <div class="info-row"><span class="k">Phone</span><span>@p.User.PhoneNumber</span></div>
+            <div class="info-row"><span class="k">Email</span><span>@p.User.Email</span></div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card-soft">
+            <div class="card-head"><h2>Visits with you</h2></div>
+            <div class="table-responsive">
+                <table class="table table-soft">
+                    <thead><tr><th>Date</th><th>Reason</th><th>Status</th><th></th></tr></thead>
+                    <tbody>
+                    @foreach (var a in Model.Appointments)
+                    {
+                        <tr>
+                            <td class="text-nowrap">@Fmt.ShortDate(a.AppointmentDate)<div class="small muted">@Fmt.Time(a.StartTime)</div></td>
+                            <td class="small">
+                                @a.ReasonForVisit
+                                @if (a.ConsultationNote != null)
+                                {
+                                    <div class="small muted mt-1">Diagnosis: @a.ConsultationNote.Diagnosis</div>
+                                }
+                            </td>
+                            <td><partial name="_StatusBadge" model="a.Status" /></td>
+                            <td class="text-end"><a class="btn btn-soft btn-sm" asp-action="AppointmentDetails" asp-route-id="@a.Id">Open</a></td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

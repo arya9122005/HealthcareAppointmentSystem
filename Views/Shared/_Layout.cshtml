@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <partial name="_Head" />
+</head>
+<body>
+    @{
+        var action = ViewContext.RouteData.Values["action"]?.ToString();
+        var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+        bool isAuth = User.Identity?.IsAuthenticated == true;
+        bool isPatient = User.IsInRole("Patient");
+        string Active(string ctrl, params string[] actions) =>
+            controller == ctrl && (actions.Length == 0 || actions.Contains(action)) ? "active" : "";
+        string homeLink = User.IsInRole("Admin") ? Url.Action("Dashboard", "Admin")
+                        : User.IsInRole("Doctor") ? Url.Action("Dashboard", "Doctor")
+                        : Url.Action("Dashboard", "Patient");
+    }
+    <header class="site-nav sticky-top">
+        <nav class="navbar navbar-expand-lg container py-2">
+            <a class="navbar-brand brand-name" asp-controller="Home" asp-action="Index">
+                <span class="brand-mark"><i class="bi bi-flower2"></i></span> Peony Health
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 gap-lg-1">
+                    @if (isPatient)
+                    {
+                        <li class="nav-item"><a class="nav-link @Active("Patient", "Dashboard")" asp-controller="Patient" asp-action="Dashboard">Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link @Active("Patient", "Doctors", "DoctorDetails", "Book")" asp-controller="Patient" asp-action="Doctors">Find doctors</a></li>
+                        <li class="nav-item"><a class="nav-link @Active("Patient", "Appointments", "AppointmentDetails")" asp-controller="Patient" asp-action="Appointments">My appointments</a></li>
+                        <li class="nav-item"><a class="nav-link @Active("Patient", "Consultations")" asp-controller="Patient" asp-action="Consultations">Consultation history</a></li>
+                    }
+                    else
+                    {
+                        <li class="nav-item"><a class="nav-link @Active("Home", "Index")" asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li class="nav-item"><a class="nav-link @Active("Home", "About")" asp-controller="Home" asp-action="About">About</a></li>
+                    }
+                </ul>
+                <div class="d-flex align-items-center gap-2">
+                    @if (isAuth)
+                    {
+                        if (!isPatient)
+                        {
+                            <a class="btn btn-soft btn-sm" href="@homeLink"><i class="bi bi-speedometer2 me-1"></i>Go to dashboard</a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-soft btn-sm" asp-controller="Patient" asp-action="Profile"><i class="bi bi-person me-1"></i>My profile</a>
+                        }
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                            <button type="submit" class="btn btn-outline-primary btn-sm">Log out</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <a class="btn btn-outline-primary btn-sm" asp-controller="Account" asp-action="Login">Log in</a>
+                        <a class="btn btn-primary btn-sm" asp-controller="Account" asp-action="Register">Create account</a>
+                    }
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        @if (controller == "Home" || controller == "Account")
+        {
+            @RenderBody()
+        }
+        else
+        {
+            <div class="container py-4 py-lg-5">
+                <partial name="_Alerts" />
+                @RenderBody()
+            </div>
+        }
+    </main>
+
+    <footer class="site-footer">
+        <div class="container d-flex flex-wrap justify-content-between gap-2">
+            <span>&copy; @DateTime.Now.Year Peony Health. Academic project built with ASP.NET Core MVC.</span>
+            <span>Demo data only. Not for real medical use.</span>
+        </div>
+    </footer>
+
+    <partial name="_Scripts" />
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

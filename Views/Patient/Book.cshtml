@@ -1,0 +1,71 @@
+@model BookAppointmentViewModel
+@{ ViewData["Title"] = "Book appointment"; }
+<a asp-action="DoctorDetails" asp-route-id="@Model.DoctorId" class="small"><i class="bi bi-arrow-left"></i> Back to doctor</a>
+<div class="page-header mt-2"><div><h1 class="page-title">Book an appointment</h1><p class="page-sub">Pick a date, then choose one of the open times.</p></div></div>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card-soft pad">
+            <div class="d-flex gap-3 align-items-center mb-3">
+                <span class="avatar">@Fmt.Initials(Model.Doctor.User.FullName)</span>
+                <div>
+                    <div class="fw-bold">@Model.Doctor.User.FullName</div>
+                    <div class="small muted">@Model.Doctor.Specialization.Name</div>
+                </div>
+            </div>
+            <div class="info-row"><span class="k">Fee</span><span>@Model.Doctor.ConsultationFee.ToString("N0")</span></div>
+            <div class="info-row"><span class="k">Experience</span><span>@Model.Doctor.ExperienceYears years</span></div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card-soft pad mb-4">
+            <form method="get" asp-action="Book">
+                <input type="hidden" name="doctorId" value="@Model.DoctorId" />
+                <label for="dateField" class="form-label">Date</label>
+                <div class="d-flex gap-2">
+                    <input id="dateField" name="date" type="date" class="form-control" style="max-width: 220px;"
+                           value="@Model.Date.ToString("yyyy-MM-dd")"
+                           min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                           max="@DateTime.Today.AddDays(AppointmentService.MaxDaysAhead).ToString("yyyy-MM-dd")" />
+                    <button type="submit" class="btn btn-soft">Show times</button>
+                </div>
+                <span asp-validation-for="Date"></span>
+            </form>
+        </div>
+
+        <div class="card-soft pad">
+            <form asp-action="Book" method="post" novalidate>
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                <input type="hidden" asp-for="DoctorId" />
+                <input type="hidden" asp-for="Date" value="@Model.Date.ToString("yyyy-MM-dd")" />
+
+                <h2 class="h5">Available times on @Fmt.Date(Model.Date)</h2>
+                @if (!Model.Slots.Any())
+                {
+                    <div class="alert alert-warning mt-3 mb-0">No open slots on this day. The doctor may not work on @Model.Date.DayOfWeek, or every slot is booked. Try another date.</div>
+                }
+                else
+                {
+                    <div class="slot-grid mt-3" role="radiogroup" aria-label="Available time slots">
+                        @foreach (var slot in Model.Slots)
+                        {
+                            <div>
+                                <input type="radio" name="SelectedStart" id="slot-@slot.Value" value="@slot.Value" checked="@(Model.SelectedStart == slot.Value)" />
+                                <label for="slot-@slot.Value">@slot.Label</label>
+                            </div>
+                        }
+                    </div>
+                    <span asp-validation-for="SelectedStart" class="d-block mt-2"></span>
+
+                    <div class="mt-4">
+                        <label asp-for="ReasonForVisit" class="form-label"></label>
+                        <textarea asp-for="ReasonForVisit" class="form-control" rows="3" placeholder="Briefly describe your symptoms or the reason for your visit"></textarea>
+                        <span asp-validation-for="ReasonForVisit"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-4">Request appointment</button>
+                }
+            </form>
+        </div>
+    </div>
+</div>

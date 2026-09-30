@@ -1,0 +1,41 @@
+@model Doctor
+@{ ViewData["Title"] = Model.User.FullName; }
+<a asp-action="Doctors" class="small"><i class="bi bi-arrow-left"></i> All doctors</a>
+<div class="row g-4 mt-1">
+    <div class="col-lg-7">
+        <div class="card-soft pad">
+            <div class="d-flex gap-3 align-items-center mb-4">
+                <span class="avatar lg">@Fmt.Initials(Model.User.FullName)</span>
+                <div>
+                    <h1 class="page-title">@Model.User.FullName</h1>
+                    <span class="pill">@Model.Specialization.Name</span>
+                </div>
+            </div>
+            <div class="info-row"><span class="k">Qualification</span><span>@Model.Qualification</span></div>
+            <div class="info-row"><span class="k">Experience</span><span>@Model.ExperienceYears years</span></div>
+            <div class="info-row"><span class="k">Consultation fee</span><span>@Model.ConsultationFee.ToString("N0")</span></div>
+            <div class="info-row"><span class="k">About</span><span>@Model.Bio</span></div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card-soft pad">
+            <h2 class="h5 mb-3">Weekly availability</h2>
+            @foreach (var day in Fmt.Week)
+            {
+                var row = Model.Schedules.FirstOrDefault(s => s.DayOfWeek == day);
+                <div class="week-row">
+                    <span class="fw-semibold">@day</span>
+                    @if (row != null)
+                    {
+                        <span>@Fmt.Time(row.StartTime) - @Fmt.Time(row.EndTime)</span>
+                    }
+                    else
+                    {
+                        <span class="muted">Not available</span>
+                    }
+                </div>
+            }
+            <a class="btn btn-primary w-100 mt-4" asp-action="Book" asp-route-doctorId="@Model.Id">Book an appointment</a>
+        </div>
+    </div>
+</div>

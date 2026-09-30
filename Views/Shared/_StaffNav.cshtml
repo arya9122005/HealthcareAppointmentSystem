@@ -1,0 +1,22 @@
+@{
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+    bool isAdmin = User.IsInRole("Admin");
+    string Active(params string[] actions) => actions.Contains(action) ? "active" : "";
+}
+@if (isAdmin)
+{
+    <a class="side-link @Active("Dashboard")" asp-controller="Admin" asp-action="Dashboard"><i class="bi bi-grid-1x2"></i>Dashboard</a>
+    <a class="side-link @Active("Patients")" asp-controller="Admin" asp-action="Patients"><i class="bi bi-people"></i>Patients</a>
+    <a class="side-link @Active("Doctors", "CreateDoctor", "EditDoctor")" asp-controller="Admin" asp-action="Doctors"><i class="bi bi-heart-pulse"></i>Doctors</a>
+    <a class="side-link @Active("Specializations")" asp-controller="Admin" asp-action="Specializations"><i class="bi bi-tags"></i>Specializations</a>
+    <a class="side-link @Active("Appointments")" asp-controller="Admin" asp-action="Appointments"><i class="bi bi-calendar2-check"></i>Appointments</a>
+    <a class="side-link @Active("Users")" asp-controller="Admin" asp-action="Users"><i class="bi bi-shield-lock"></i>Users &amp; roles</a>
+}
+else
+{
+    <a class="side-link @Active("Dashboard")" asp-controller="Doctor" asp-action="Dashboard"><i class="bi bi-grid-1x2"></i>Dashboard</a>
+    <a class="side-link @Active("Schedule")" asp-controller="Doctor" asp-action="Schedule"><i class="bi bi-clock"></i>My schedule</a>
+    <a class="side-link @Active("Appointments", "AppointmentDetails", "Complete", "PatientDetails")" asp-controller="Doctor" asp-action="Appointments"><i class="bi bi-calendar2-check"></i>Appointments</a>
+    <a class="side-link @Active("Notes")" asp-controller="Doctor" asp-action="Notes"><i class="bi bi-journal-medical"></i>Consultation notes</a>
+    <a class="side-link @Active("Profile")" asp-controller="Doctor" asp-action="Profile"><i class="bi bi-person-circle"></i>My profile</a>
+}

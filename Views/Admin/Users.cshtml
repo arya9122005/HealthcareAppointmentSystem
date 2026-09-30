@@ -1,0 +1,29 @@
+@model List<UserRowViewModel>
+@{ ViewData["Title"] = "Users & roles"; }
+<div class="page-header"><div><h1 class="page-title">Users &amp; roles</h1><p class="page-sub">Grant administrator access or deactivate accounts.</p></div></div>
+<div class="card-soft">
+    <div class="table-responsive">
+        <table class="table table-soft">
+            <thead><tr><th>User</th><th>Roles</th><th>Joined</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var u in Model)
+            {
+                <tr>
+                    <td><div class="fw-semibold">@u.FullName</div><div class="small muted">@u.Email</div></td>
+                    <td>@foreach (var r in u.Roles){<span class="pill me-1">@r</span>}</td>
+                    <td class="text-nowrap">@Fmt.ShortDate(u.CreatedAt)</td>
+                    <td><span class="status @(u.IsActive ? "status-completed" : "status-cancelled")">@(u.IsActive ? "Active" : "Deactivated")</span></td>
+                    <td class="text-end text-nowrap">
+                        <form asp-action="ToggleAdmin" asp-route-id="@u.Id" method="post" class="d-inline">
+                            <button class="btn btn-soft btn-sm" type="submit">@(u.Roles.Contains("Admin") ? "Remove admin" : "Make admin")</button>
+                        </form>
+                        <form asp-action="ToggleUserActive" asp-route-id="@u.Id" method="post" class="d-inline" onsubmit="return confirm('@(u.IsActive ? "Deactivate" : "Reactivate") this account?');">
+                            <button class="btn @(u.IsActive ? "btn-outline-danger" : "btn-outline-primary") btn-sm" type="submit">@(u.IsActive ? "Deactivate" : "Reactivate")</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

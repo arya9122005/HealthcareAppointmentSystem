@@ -1,0 +1,34 @@
+@model List<Appointment>
+@{ ViewData["Title"] = "Consultation history"; }
+<div class="page-header"><div><h1 class="page-title">Consultation history</h1><p class="page-sub">Notes and prescriptions from your completed visits.</p></div></div>
+
+@if (!Model.Any())
+{
+    <div class="card-soft empty-state"><i class="bi bi-journal-medical"></i><p class="mb-0">No consultation notes yet. They appear after a doctor completes your appointment.</p></div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var a in Model)
+        {
+            <div class="col-lg-6">
+                <div class="card-soft pad h-100">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <div class="fw-bold">@a.Doctor.User.FullName</div>
+                            <div class="small muted">@a.Doctor.Specialization.Name · @Fmt.ShortDate(a.AppointmentDate)</div>
+                        </div>
+                        <a class="btn btn-soft btn-sm" asp-action="AppointmentDetails" asp-route-id="@a.Id">Details</a>
+                    </div>
+                    <div class="note-block mb-3"><div class="small muted">Diagnosis</div><div class="fw-semibold">@a.ConsultationNote.Diagnosis</div></div>
+                    <p class="small">@a.ConsultationNote.Notes</p>
+                    @if (!string.IsNullOrWhiteSpace(a.ConsultationNote.Prescription))
+                    {
+                        <div class="small muted">Prescription</div>
+                        <div class="small">@a.ConsultationNote.Prescription</div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}

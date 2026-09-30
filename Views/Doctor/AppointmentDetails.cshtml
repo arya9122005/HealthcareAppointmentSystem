@@ -1,0 +1,59 @@
+@model Appointment
+@{
+    ViewData["Title"] = "Appointment details";
+    bool canComplete = (Model.Status == AppointmentStatus.Confirmed || Model.Status == AppointmentStatus.Completed) && Model.AppointmentDate <= DateTime.Today;
+}
+<a asp-action="Appointments" class="small"><i class="bi bi-arrow-left"></i> Appointments</a>
+<div class="page-header mt-2">
+    <div><h1 class="page-title">Appointment details</h1></div>
+    <partial name="_StatusBadge" model="Model.Status" />
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card-soft pad h-100">
+            <h2 class="h5 mb-3">Visit</h2>
+            <div class="info-row"><span class="k">Date</span><span>@Fmt.Date(Model.AppointmentDate)</span></div>
+            <div class="info-row"><span class="k">Time</span><span>@Fmt.Time(Model.StartTime) - @Fmt.Time(Model.EndTime)</span></div>
+            <div class="info-row"><span class="k">Reason for visit</span><span>@Model.ReasonForVisit</span></div>
+            <div class="info-row"><span class="k">Booked on</span><span>@Fmt.ShortDate(Model.CreatedAt)</span></div>
+
+            <div class="d-flex flex-wrap gap-2 mt-4">
+                @if (Model.Status == AppointmentStatus.Pending)
+                {
+                    <form asp-action="Confirm" asp-route-id="@Model.Id" asp-route-returnTo="details" method="post"><button class="btn btn-primary" type="submit">Confirm appointment</button></form>
+                }
+                @if (canComplete)
+                {
+                    <a class="btn btn-success" asp-action="Complete" asp-route-id="@Model.Id">@(Model.Status == AppointmentStatus.Completed ? "Edit consultation notes" : "Complete & add notes")</a>
+                }
+                @if (Model.Status == AppointmentStatus.Pending || Model.Status == AppointmentStatus.Confirmed)
+                {
+                    <form asp-action="Cancel" asp-route-id="@Model.Id" asp-route-returnTo="details" method="post" onsubmit="return confirm('Cancel this appointment?');"><button class="btn btn-outline-danger" type="submit">Cancel</button></form>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card-soft pad h-100">
+            <h2 class="h5 mb-3">Patient</h2>
+            <div class="d-flex gap-3 align-items-center mb-3">
+                <span class="avatar">@Fmt.Initials(Model.Patient.User.FullName)</span>
+                <div><div class="fw-bold">@Model.Patient.User.FullName</div><div class="small muted">@Model.Patient.User.PhoneNumber</div></div>
+            </div>
+            <a class="btn btn-soft btn-sm" asp-action="PatientDetails" asp-route-id="@Model.PatientId">View patient details</a>
+        </div>
+    </div>
+    @if (Model.ConsultationNote != null)
+    {
+        <div class="col-12">
+            <div class="card-soft pad">
+                <h2 class="h5 mb-3">Consultation notes</h2>
+                <div class="note-block mb-3"><div class="small muted">Diagnosis</div><div class="fw-semibold">@Model.ConsultationNote.Diagnosis</div></div>
+                <p>@Model.ConsultationNote.Notes</p>
+                <div class="small muted">Prescription</div>
+                <div>@Model.ConsultationNote.Prescription</div>
+            </div>
+        </div>
+    }
+</div>

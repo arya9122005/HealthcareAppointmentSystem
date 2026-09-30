@@ -1,0 +1,30 @@
+@model List<Patient>
+@{ ViewData["Title"] = "Patients"; }
+<div class="page-header"><div><h1 class="page-title">Patients</h1><p class="page-sub">@Model.Count registered patient(s).</p></div></div>
+<div class="card-soft">
+    @if (!Model.Any())
+    {
+        <div class="empty-state"><i class="bi bi-people"></i><p class="mb-0">No patients have registered yet.</p></div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-soft">
+                <thead><tr><th>Patient</th><th>Phone</th><th>Gender</th><th>Blood group</th><th>Appointments</th><th>Account</th></tr></thead>
+                <tbody>
+                @foreach (var p in Model)
+                {
+                    <tr>
+                        <td><div class="d-flex gap-2 align-items-center"><span class="avatar sm">@Fmt.Initials(p.User.FullName)</span><div><div class="fw-semibold">@p.User.FullName</div><div class="small muted">@p.User.Email</div></div></div></td>
+                        <td>@p.User.PhoneNumber</td>
+                        <td>@p.Gender</td>
+                        <td>@p.BloodGroup</td>
+                        <td>@p.Appointments.Count</td>
+                        <td><span class="status @(p.User.IsActive ? "status-completed" : "status-cancelled")">@(p.User.IsActive ? "Active" : "Deactivated")</span></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

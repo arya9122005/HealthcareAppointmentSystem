@@ -1,0 +1,42 @@
+@model ConsultationNoteViewModel
+@{ ViewData["Title"] = "Consultation notes"; }
+<a asp-action="AppointmentDetails" asp-route-id="@Model.AppointmentId" class="small"><i class="bi bi-arrow-left"></i> Back to appointment</a>
+<div class="page-header mt-2">
+    <div>
+        <h1 class="page-title">Consultation notes</h1>
+        <p class="page-sub">@Model.Appointment.Patient.User.FullName · @Fmt.Date(Model.Appointment.AppointmentDate) at @Fmt.Time(Model.Appointment.StartTime)</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card-soft pad">
+            <form asp-action="Complete" method="post" novalidate>
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                <input type="hidden" asp-for="AppointmentId" />
+                <div class="mb-3">
+                    <label asp-for="Diagnosis" class="form-label"></label>
+                    <input asp-for="Diagnosis" class="form-control" />
+                    <span asp-validation-for="Diagnosis"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Notes" class="form-label"></label>
+                    <textarea asp-for="Notes" class="form-control" rows="6"></textarea>
+                    <span asp-validation-for="Notes"></span>
+                </div>
+                <div class="mb-4">
+                    <label asp-for="Prescription" class="form-label"></label>
+                    <textarea asp-for="Prescription" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Prescription"></span>
+                </div>
+                <button type="submit" class="btn btn-success">@(Model.Appointment.Status == AppointmentStatus.Completed ? "Save changes" : "Save & mark completed")</button>
+            </form>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card-soft pad">
+            <div class="small muted mb-1">Reason for visit</div>
+            <div>@Model.Appointment.ReasonForVisit</div>
+        </div>
+    </div>
+</div>

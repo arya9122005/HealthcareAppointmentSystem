@@ -1,0 +1,92 @@
+@model List<Specialization>
+@{
+    ViewData["Title"] = "Home";
+    bool isAuth = User.Identity?.IsAuthenticated == true;
+    string dash = User.IsInRole("Admin") ? Url.Action("Dashboard", "Admin")
+                : User.IsInRole("Doctor") ? Url.Action("Dashboard", "Doctor")
+                : Url.Action("Dashboard", "Patient");
+}
+<section class="hero">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <h1 class="display-title">See the right doctor at a time that suits you.</h1>
+                <p class="lead-soft">Browse specialists, choose an open slot, and keep your appointments and consultation notes together in one calm place.</p>
+                <div class="d-flex gap-2 flex-wrap">
+                    @if (isAuth)
+                    {
+                        <a class="btn btn-primary btn-lg" href="@dash">Open my dashboard</a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-primary btn-lg" asp-controller="Account" asp-action="Register">Create a free account</a>
+                        <a class="btn btn-outline-primary btn-lg" asp-controller="Account" asp-action="Login">Log in</a>
+                    }
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="visit-card" aria-hidden="true">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <span class="avatar">AS</span>
+                        <div>
+                            <div class="fw-bold">Dr. Ananya Sharma</div>
+                            <div class="small muted">Cardiology</div>
+                        </div>
+                    </div>
+                    <div class="small muted mb-1">Open slots on Monday</div>
+                    <div class="mb-3">
+                        <span class="slot-chip taken">9:00 AM</span>
+                        <span class="slot-chip chosen">9:30 AM</span>
+                        <span class="slot-chip">10:00 AM</span>
+                        <span class="slot-chip">10:30 AM</span>
+                        <span class="slot-chip taken">11:00 AM</span>
+                        <span class="slot-chip">11:30 AM</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="status status-confirmed">Confirmed</span>
+                        <span class="small muted">Booked slots are hidden automatically</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="container py-5">
+    <div class="row g-4 align-items-stretch">
+        <div class="col-lg-4">
+            <div class="card-soft pad h-100">
+                <div class="step-num">1</div>
+                <h3 class="h5">Find a doctor</h3>
+                <p class="muted mb-0">Search by name or specialization and read each doctor's background, fee and weekly availability.</p>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card-soft pad h-100">
+                <div class="step-num">2</div>
+                <h3 class="h5">Pick an open slot</h3>
+                <p class="muted mb-0">Choose a date and a free time. Slots that are already taken never appear, so double bookings can't happen.</p>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card-soft pad h-100">
+                <div class="step-num">3</div>
+                <h3 class="h5">Visit and follow up</h3>
+                <p class="muted mb-0">After your visit, the doctor's consultation notes and prescription appear in your history.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+@if (Model.Any())
+{
+    <section class="container pb-5">
+        <h2 class="h3 mb-3">Specialties available</h2>
+        <div class="d-flex flex-wrap gap-2">
+            @foreach (var s in Model)
+            {
+                <a class="pill pill-rose py-2 px-3" asp-controller="Patient" asp-action="Doctors" asp-route-specializationId="@s.Id">@s.Name</a>
+            }
+        </div>
+    </section>
+}

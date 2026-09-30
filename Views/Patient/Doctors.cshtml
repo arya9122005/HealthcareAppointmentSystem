@@ -1,0 +1,58 @@
+@model DoctorListViewModel
+@{ ViewData["Title"] = "Find doctors"; }
+<div class="page-header"><div><h1 class="page-title">Find a doctor</h1><p class="page-sub">Search by name or specialization.</p></div></div>
+
+<form method="get" asp-action="Doctors" class="card-soft pad mb-4">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-6">
+            <label for="search" class="form-label">Doctor or specialization</label>
+            <input id="search" name="search" value="@Model.Search" class="form-control" placeholder="e.g. Sharma or Cardiology" />
+        </div>
+        <div class="col-md-4">
+            <label for="specializationId" class="form-label">Specialization</label>
+            <select id="specializationId" name="specializationId" class="form-select">
+                <option value="">All specializations</option>
+                @foreach (var s in Model.Specializations)
+                {
+                    <option value="@s.Id" selected="@(Model.SpecializationId == s.Id)">@s.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2 d-grid"><button class="btn btn-primary" type="submit">Search</button></div>
+    </div>
+</form>
+
+@if (!Model.Doctors.Any())
+{
+    <div class="card-soft empty-state">
+        <i class="bi bi-search-heart"></i>
+        <p class="mb-2">No doctors match your search.</p>
+        <a class="btn btn-soft btn-sm" asp-action="Doctors">Clear search</a>
+    </div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var d in Model.Doctors)
+        {
+            <div class="col-md-6 col-xl-4">
+                <div class="card-soft card-lift pad h-100 d-flex flex-column">
+                    <div class="d-flex gap-3 align-items-center mb-3">
+                        <span class="avatar">@Fmt.Initials(d.User.FullName)</span>
+                        <div>
+                            <h2 class="h6 mb-1">@d.User.FullName</h2>
+                            <span class="pill">@d.Specialization.Name</span>
+                        </div>
+                    </div>
+                    <div class="small muted mb-1">@d.Qualification</div>
+                    <div class="small muted mb-3">@d.ExperienceYears years experience · Fee @d.ConsultationFee.ToString("N0")</div>
+                    <p class="small mb-3">@d.Bio</p>
+                    <div class="d-flex gap-2 mt-auto">
+                        <a class="btn btn-soft btn-sm" asp-action="DoctorDetails" asp-route-id="@d.Id">View profile</a>
+                        <a class="btn btn-primary btn-sm" asp-action="Book" asp-route-doctorId="@d.Id">Book</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

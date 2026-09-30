@@ -1,0 +1,79 @@
+@model PatientDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    var firstName = Model.FullName.Split(' ')[0];
+}
+<div class="welcome-card mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <h1 class="page-title">Hello, @firstName</h1>
+            <p class="page-sub">@(Model.Next != null ? "Your next visit is coming up." : "You have no upcoming appointments.")</p>
+        </div>
+        <a class="btn btn-primary btn-lg" asp-action="Doctors"><i class="bi bi-calendar-plus me-2"></i>Book appointment</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-4"><partial name="_StatCard" model='new StatCard("Upcoming", Model.UpcomingCount, "bi-calendar-event", "rose")' /></div>
+    <div class="col-sm-4"><partial name="_StatCard" model='new StatCard("Completed visits", Model.CompletedCount, "bi-check2-circle", "green")' /></div>
+    <div class="col-sm-4"><partial name="_StatCard" model='new StatCard("Total appointments", Model.TotalCount, "bi-journal-text", "lilac")' /></div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="card-soft h-100">
+            <div class="card-head"><h2>Next appointment</h2></div>
+            @if (Model.Next == null)
+            {
+                <div class="empty-state">
+                    <i class="bi bi-calendar-heart"></i>
+                    <p>Nothing scheduled yet.</p>
+                    <a class="btn btn-primary btn-sm" asp-action="Doctors">Find a doctor</a>
+                </div>
+            }
+            else
+            {
+                <div class="card-body-pad">
+                    <div class="d-flex gap-3 align-items-center mb-3">
+                        <span class="avatar">@Fmt.Initials(Model.Next.Doctor.User.FullName)</span>
+                        <div>
+                            <div class="fw-bold">@Model.Next.Doctor.User.FullName</div>
+                            <div class="small muted">@Model.Next.Doctor.Specialization.Name</div>
+                        </div>
+                    </div>
+                    <div class="info-row"><span class="k">Date</span><span>@Fmt.Date(Model.Next.AppointmentDate)</span></div>
+                    <div class="info-row"><span class="k">Time</span><span>@Fmt.Time(Model.Next.StartTime) - @Fmt.Time(Model.Next.EndTime)</span></div>
+                    <div class="info-row"><span class="k">Status</span><partial name="_StatusBadge" model="Model.Next.Status" /></div>
+                    <a class="btn btn-soft btn-sm mt-3" asp-action="AppointmentDetails" asp-route-id="@Model.Next.Id">View details</a>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="card-soft h-100">
+            <div class="card-head"><h2>Recent appointments</h2><a asp-action="Appointments" class="small">View all</a></div>
+            @if (!Model.Recent.Any())
+            {
+                <div class="empty-state"><i class="bi bi-clock-history"></i><p class="mb-0">Your appointment history will appear here.</p></div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-soft">
+                        <thead><tr><th>Doctor</th><th>Date</th><th>Status</th></tr></thead>
+                        <tbody>
+                        @foreach (var a in Model.Recent)
+                        {
+                            <tr>
+                                <td><a asp-action="AppointmentDetails" asp-route-id="@a.Id" class="fw-semibold">@a.Doctor.User.FullName</a><div class="small muted">@a.Doctor.Specialization.Name</div></td>
+                                <td>@Fmt.ShortDate(a.AppointmentDate)<div class="small muted">@Fmt.Time(a.StartTime)</div></td>
+                                <td><partial name="_StatusBadge" model="a.Status" /></td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

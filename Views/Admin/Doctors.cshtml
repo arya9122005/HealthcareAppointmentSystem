@@ -1,0 +1,38 @@
+@model List<Doctor>
+@{ ViewData["Title"] = "Doctors"; }
+<div class="page-header">
+    <div><h1 class="page-title">Doctors</h1><p class="page-sub">Add, edit or deactivate doctors.</p></div>
+    <a class="btn btn-primary" asp-action="CreateDoctor"><i class="bi bi-plus-lg me-1"></i>Add doctor</a>
+</div>
+<div class="card-soft">
+    @if (!Model.Any())
+    {
+        <div class="empty-state"><i class="bi bi-heart-pulse"></i><p class="mb-0">No doctors yet. Add the first one.</p></div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-soft">
+                <thead><tr><th>Doctor</th><th>Specialization</th><th>Experience</th><th>Fee</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                @foreach (var d in Model)
+                {
+                    <tr>
+                        <td><div class="d-flex gap-2 align-items-center"><span class="avatar sm">@Fmt.Initials(d.User.FullName)</span><div><div class="fw-semibold">@d.User.FullName</div><div class="small muted">@d.User.Email</div></div></div></td>
+                        <td><span class="pill">@d.Specialization.Name</span></td>
+                        <td>@d.ExperienceYears yrs</td>
+                        <td>@d.ConsultationFee.ToString("N0")</td>
+                        <td><span class="status @(d.IsActive ? "status-completed" : "status-cancelled")">@(d.IsActive ? "Active" : "Inactive")</span></td>
+                        <td class="text-end text-nowrap">
+                            <a class="btn btn-soft btn-sm" asp-action="EditDoctor" asp-route-id="@d.Id">Edit</a>
+                            <form asp-action="ToggleDoctor" asp-route-id="@d.Id" method="post" class="d-inline" onsubmit="return confirm('@(d.IsActive ? "Deactivate" : "Reactivate") this doctor?');">
+                                <button type="submit" class="btn @(d.IsActive ? "btn-outline-danger" : "btn-outline-primary") btn-sm">@(d.IsActive ? "Deactivate" : "Reactivate")</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

@@ -1,0 +1,46 @@
+@model AdminAppointmentsViewModel
+@{ ViewData["Title"] = "Appointments"; }
+<div class="page-header">
+    <div><h1 class="page-title">Appointments</h1><p class="page-sub">@Model.Items.Count appointment(s) shown.</p></div>
+    <div class="d-flex flex-wrap gap-1">
+        <a class="btn btn-sm @(Model.Status == null ? "btn-primary" : "btn-outline-primary")" asp-action="Appointments">All</a>
+        @foreach (var s in Enum.GetNames(typeof(AppointmentStatus)))
+        {
+            <a class="btn btn-sm @(Model.Status == s ? "btn-primary" : "btn-outline-primary")" asp-action="Appointments" asp-route-status="@s">@s</a>
+        }
+    </div>
+</div>
+<div class="card-soft">
+    @if (!Model.Items.Any())
+    {
+        <div class="empty-state"><i class="bi bi-calendar2-x"></i><p class="mb-0">No appointments match this filter.</p></div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-soft">
+                <thead><tr><th>#</th><th>Patient</th><th>Doctor</th><th>Date &amp; time</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                @foreach (var a in Model.Items)
+                {
+                    <tr>
+                        <td class="muted">@a.Id</td>
+                        <td>@a.Patient.User.FullName</td>
+                        <td>@a.Doctor.User.FullName<div class="small muted">@a.Doctor.Specialization.Name</div></td>
+                        <td class="text-nowrap">@Fmt.ShortDate(a.AppointmentDate)<div class="small muted">@Fmt.Time(a.StartTime) - @Fmt.Time(a.EndTime)</div></td>
+                        <td><partial name="_StatusBadge" model="a.Status" /></td>
+                        <td class="text-end">
+                            @if (a.Status == AppointmentStatus.Pending || a.Status == AppointmentStatus.Confirmed)
+                            {
+                                <form asp-action="CancelAppointment" asp-route-id="@a.Id" asp-route-status="@Model.Status" method="post" onsubmit="return confirm('Cancel this appointment?');">
+                                    <button class="btn btn-outline-danger btn-sm" type="submit">Cancel</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

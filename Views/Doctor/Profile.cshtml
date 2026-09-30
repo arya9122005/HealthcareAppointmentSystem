@@ -1,0 +1,51 @@
+@model DoctorProfileViewModel
+@{ ViewData["Title"] = "My profile"; }
+<div class="page-header"><div><h1 class="page-title">My profile</h1><p class="page-sub">This is what patients see when they search for doctors.</p></div></div>
+
+<div class="card-soft pad">
+    <form asp-action="Profile" method="post" novalidate>
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="FullName" class="form-label"></label>
+                <input asp-for="FullName" class="form-control" />
+                <span asp-validation-for="FullName"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" readonly />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Phone" class="form-label"></label>
+                <input asp-for="Phone" class="form-control" />
+                <span asp-validation-for="Phone"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="SpecializationId" class="form-label"></label>
+                <select asp-for="SpecializationId" class="form-select" asp-items="@(new SelectList(Model.Specializations, "Id", "Name"))"></select>
+                <span asp-validation-for="SpecializationId"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Qualification" class="form-label"></label>
+                <input asp-for="Qualification" class="form-control" />
+                <span asp-validation-for="Qualification"></span>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="ExperienceYears" class="form-label"></label>
+                <input asp-for="ExperienceYears" type="number" class="form-control" min="0" max="60" />
+                <span asp-validation-for="ExperienceYears"></span>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="ConsultationFee" class="form-label"></label>
+                <input asp-for="ConsultationFee" type="number" step="1" class="form-control" min="0" />
+                <span asp-validation-for="ConsultationFee"></span>
+            </div>
+            <div class="col-12">
+                <label asp-for="Bio" class="form-label"></label>
+                <textarea asp-for="Bio" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Bio"></span>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-4">Save changes</button>
+    </form>
+</div>

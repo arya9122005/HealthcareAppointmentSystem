@@ -1,0 +1,39 @@
+@model ScheduleViewModel
+@{ ViewData["Title"] = "My schedule"; }
+<div class="page-header"><div><h1 class="page-title">My schedule</h1><p class="page-sub">Switch on the days you work and set your hours. Patients can only book inside these windows.</p></div></div>
+
+<div class="card-soft pad">
+    <form asp-action="Schedule" method="post" novalidate>
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        @for (var i = 0; i < Model.Days.Count; i++)
+        {
+            var day = Model.Days[i];
+            <div class="schedule-row">
+                <div class="form-check form-switch">
+                    <input type="hidden" asp-for="Days[i].Day" />
+                    <input asp-for="Days[i].IsAvailable" class="form-check-input" role="switch" data-day-toggle="fields-@i" />
+                    <label asp-for="Days[i].IsAvailable" class="form-check-label fw-bold">@day.Day</label>
+                </div>
+                <div>
+                    <div class="schedule-fields" id="fields-@i">
+                        <div>
+                            <label class="form-label small" for="start-@i">From</label>
+                            <input id="start-@i" type="time" class="form-control" name="Days[@i].StartTime" value="@day.StartTime.ToString(@"hh\:mm")" />
+                        </div>
+                        <div>
+                            <label class="form-label small" for="end-@i">To</label>
+                            <input id="end-@i" type="time" class="form-control" name="Days[@i].EndTime" value="@day.EndTime.ToString(@"hh\:mm")" />
+                        </div>
+                        <div>
+                            <label class="form-label small" for="slot-@i">Slot length (min)</label>
+                            <input id="slot-@i" type="number" class="form-control" style="width: 120px;" min="10" max="120" step="5" name="Days[@i].SlotMinutes" value="@day.SlotMinutes" />
+                        </div>
+                    </div>
+                    <span asp-validation-for="Days[i].EndTime"></span>
+                    <span asp-validation-for="Days[i].SlotMinutes"></span>
+                </div>
+            </div>
+        }
+        <button type="submit" class="btn btn-primary mt-4">Save schedule</button>
+    </form>
+</div>

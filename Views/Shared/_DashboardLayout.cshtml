@@ -1,0 +1,62 @@
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <partial name="_Head" />
+</head>
+<body class="theme-staff">
+    @{
+        bool isAdmin = User.IsInRole("Admin");
+        var me = await UserManager.GetUserAsync(User);
+        var name = me?.FullName ?? "";
+    }
+    <div class="staff-shell">
+        <aside class="sidebar d-none d-lg-flex">
+            <a class="brand-name text-decoration-none" asp-controller="Home" asp-action="Index">
+                <span class="brand-mark"><i class="bi bi-flower2"></i></span> Peony Health
+            </a>
+            <div class="role-tag">@(isAdmin ? "Administrator" : "Doctor workspace")</div>
+            <nav><partial name="_StaffNav" /></nav>
+            <div class="sidebar-footer">
+                <form asp-controller="Account" asp-action="Logout" method="post">
+                    <button type="submit" class="side-link w-100 border-0 bg-transparent text-start"><i class="bi bi-box-arrow-left"></i>Log out</button>
+                </form>
+            </div>
+        </aside>
+
+        <div class="offcanvas offcanvas-start offcanvas-plum text-white" tabindex="-1" id="staffMenu" aria-labelledby="staffMenuLabel">
+            <div class="offcanvas-header">
+                <span class="brand-name text-white" id="staffMenuLabel"><span class="brand-mark"><i class="bi bi-flower2"></i></span> Peony Health</span>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <nav><partial name="_StaffNav" /></nav>
+                <form asp-controller="Account" asp-action="Logout" method="post" class="mt-3">
+                    <button type="submit" class="side-link w-100 border-0 bg-transparent text-start"><i class="bi bi-box-arrow-left"></i>Log out</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="staff-main">
+            <div class="staff-topbar">
+                <button class="btn btn-soft d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#staffMenu" aria-controls="staffMenu">
+                    <i class="bi bi-list"></i><span class="visually-hidden">Open menu</span>
+                </button>
+                <span class="d-none d-lg-inline"></span>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="muted small d-none d-sm-inline">@name</span>
+                    <span class="avatar sm">@Fmt.Initials(name)</span>
+                </div>
+            </div>
+            <div class="staff-content">
+                <partial name="_Alerts" />
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+    <partial name="_Scripts" />
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

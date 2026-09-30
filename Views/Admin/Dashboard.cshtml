@@ -1,0 +1,54 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin dashboard";
+    int total = Math.Max(Model.TotalAppointments, 1);
+    string Pct(int n) => (n * 100 / total).ToString();
+}
+<div class="page-header"><div><h1 class="page-title">Dashboard</h1><p class="page-sub">A quick look at how the clinic is doing.</p></div></div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-xl-4"><partial name="_StatCard" model='new StatCard("Patients", Model.TotalPatients, "bi-people", "rose")' /></div>
+    <div class="col-6 col-xl-4"><partial name="_StatCard" model='new StatCard("Active doctors", Model.TotalDoctors, "bi-heart-pulse", "lilac")' /></div>
+    <div class="col-6 col-xl-4"><partial name="_StatCard" model='new StatCard("Appointments", Model.TotalAppointments, "bi-calendar2-check", "lilac")' /></div>
+    <div class="col-6 col-xl-4"><partial name="_StatCard" model='new StatCard("Pending", Model.Pending, "bi-hourglass-split", "amber")' /></div>
+    <div class="col-6 col-xl-4"><partial name="_StatCard" model='new StatCard("Completed", Model.Completed, "bi-check2-circle", "green")' /></div>
+    <div class="col-6 col-xl-4"><partial name="_StatCard" model='new StatCard("Cancelled", Model.Cancelled, "bi-x-circle", "red")' /></div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-4">
+        <div class="card-soft pad h-100">
+            <h2 class="h5 mb-4">Appointments by status</h2>
+            @foreach (var row in new[] {
+                ("Pending", Model.Pending, "bar-pending"), ("Confirmed", Model.Confirmed, "bar-confirmed"),
+                ("Completed", Model.Completed, "bar-completed"), ("Cancelled", Model.Cancelled, "bar-cancelled") })
+            {
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between small mb-1"><span>@row.Item1</span><span class="fw-bold">@row.Item2</span></div>
+                    <div class="bar-track" role="img" aria-label="@row.Item1: @row.Item2 of @Model.TotalAppointments"><div class="bar-fill @row.Item3" style="width: @(Pct(row.Item2))%"></div></div>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="col-xl-8">
+        <div class="card-soft h-100">
+            <div class="card-head"><h2>Recent appointments</h2><a asp-action="Appointments" class="small">View all</a></div>
+            <div class="table-responsive">
+                <table class="table table-soft">
+                    <thead><tr><th>Patient</th><th>Doctor</th><th>Date</th><th>Status</th></tr></thead>
+                    <tbody>
+                    @foreach (var a in Model.Recent)
+                    {
+                        <tr>
+                            <td>@a.Patient.User.FullName</td>
+                            <td>@a.Doctor.User.FullName<div class="small muted">@a.Doctor.Specialization.Name</div></td>
+                            <td class="text-nowrap">@Fmt.ShortDate(a.AppointmentDate)<div class="small muted">@Fmt.Time(a.StartTime)</div></td>
+                            <td><partial name="_StatusBadge" model="a.Status" /></td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,75 @@
+@model DoctorDashboardViewModel
+@{ ViewData["Title"] = "Dashboard"; }
+<div class="welcome-card mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <h1 class="page-title">Good day, @Model.Doctor.User.FullName</h1>
+            <p class="page-sub">@Model.Doctor.Specialization.Name · @(Model.Today.Any() ? $"{Model.Today.Count} appointment(s) today" : "No appointments today")</p>
+        </div>
+        <a class="btn btn-primary" asp-action="Schedule"><i class="bi bi-clock me-2"></i>Manage schedule</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3"><partial name="_StatCard" model='new StatCard("Today", Model.Today.Count, "bi-calendar-day", "rose")' /></div>
+    <div class="col-6 col-xl-3"><partial name="_StatCard" model='new StatCard("Pending confirmation", Model.PendingCount, "bi-hourglass-split", "amber")' /></div>
+    <div class="col-6 col-xl-3"><partial name="_StatCard" model='new StatCard("Total patients", Model.TotalPatients, "bi-people", "lilac")' /></div>
+    <div class="col-6 col-xl-3"><partial name="_StatCard" model='new StatCard("Completed", Model.CompletedCount, "bi-check2-circle", "green")' /></div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-6">
+        <div class="card-soft h-100">
+            <div class="card-head"><h2>Today's appointments</h2></div>
+            @if (!Model.Today.Any())
+            {
+                <div class="empty-state"><i class="bi bi-cup-hot"></i><p class="mb-0">Nothing scheduled for today.</p></div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-soft">
+                        <tbody>
+                        @foreach (var a in Model.Today)
+                        {
+                            <tr>
+                                <td class="fw-semibold text-nowrap">@Fmt.Time(a.StartTime)</td>
+                                <td>@a.Patient.User.FullName<div class="small muted">@a.ReasonForVisit</div></td>
+                                <td><partial name="_StatusBadge" model="a.Status" /></td>
+                                <td class="text-end"><a class="btn btn-soft btn-sm" asp-action="AppointmentDetails" asp-route-id="@a.Id">Open</a></td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="card-soft h-100">
+            <div class="card-head"><h2>Upcoming</h2><a asp-action="Appointments" class="small">View all</a></div>
+            @if (!Model.Upcoming.Any())
+            {
+                <div class="empty-state"><i class="bi bi-calendar-heart"></i><p class="mb-0">No upcoming appointments.</p></div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-soft">
+                        <tbody>
+                        @foreach (var a in Model.Upcoming)
+                        {
+                            <tr>
+                                <td class="text-nowrap">@Fmt.ShortDate(a.AppointmentDate)<div class="small muted">@Fmt.Time(a.StartTime)</div></td>
+                                <td>@a.Patient.User.FullName</td>
+                                <td><partial name="_StatusBadge" model="a.Status" /></td>
+                                <td class="text-end"><a class="btn btn-soft btn-sm" asp-action="AppointmentDetails" asp-route-id="@a.Id">Open</a></td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

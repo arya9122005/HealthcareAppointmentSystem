@@ -1,0 +1,50 @@
+@model DoctorAppointmentsViewModel
+@{ ViewData["Title"] = "Appointments"; }
+<div class="page-header">
+    <div><h1 class="page-title">Appointments</h1><p class="page-sub">Confirm, complete or cancel your patients' visits.</p></div>
+    <div class="btn-group" role="group" aria-label="Appointment view">
+        <a class="btn @(Model.View == "upcoming" ? "btn-primary" : "btn-outline-primary")" asp-action="Appointments" asp-route-view="upcoming">Upcoming</a>
+        <a class="btn @(Model.View == "history" ? "btn-primary" : "btn-outline-primary")" asp-action="Appointments" asp-route-view="history">History</a>
+    </div>
+</div>
+
+<div class="card-soft">
+    @if (!Model.Items.Any())
+    {
+        <div class="empty-state"><i class="bi bi-calendar2-heart"></i><p class="mb-0">@(Model.View == "upcoming" ? "No upcoming appointments." : "No past appointments yet.")</p></div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-soft">
+                <thead><tr><th>Date &amp; time</th><th>Patient</th><th>Reason</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                @foreach (var a in Model.Items)
+                {
+                    <tr>
+                        <td class="text-nowrap">@Fmt.ShortDate(a.AppointmentDate)<div class="small muted">@Fmt.Time(a.StartTime) - @Fmt.Time(a.EndTime)</div></td>
+                        <td><a asp-action="PatientDetails" asp-route-id="@a.PatientId" class="fw-semibold">@a.Patient.User.FullName</a></td>
+                        <td class="small">@a.ReasonForVisit</td>
+                        <td><partial name="_StatusBadge" model="a.Status" /></td>
+                        <td class="text-end text-nowrap">
+                            <a class="btn btn-soft btn-sm" asp-action="AppointmentDetails" asp-route-id="@a.Id">Details</a>
+                            @if (a.Status == AppointmentStatus.Pending)
+                            {
+                                <form asp-action="Confirm" asp-route-id="@a.Id" method="post" class="d-inline"><button class="btn btn-primary btn-sm" type="submit">Confirm</button></form>
+                            }
+                            @if (a.Status == AppointmentStatus.Confirmed && a.AppointmentDate <= DateTime.Today)
+                            {
+                                <a class="btn btn-success btn-sm" asp-action="Complete" asp-route-id="@a.Id">Complete</a>
+                            }
+                            @if (a.Status == AppointmentStatus.Pending || a.Status == AppointmentStatus.Confirmed)
+                            {
+                                <form asp-action="Cancel" asp-route-id="@a.Id" method="post" class="d-inline" onsubmit="return confirm('Cancel this appointment?');"><button class="btn btn-outline-danger btn-sm" type="submit">Cancel</button></form>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
